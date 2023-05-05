@@ -1,4 +1,5 @@
 import time
+import traceback
 
 
 def try_catch(func):
@@ -7,8 +8,8 @@ def try_catch(func):
             return func(*args, **kwargs)
         except Exception as e:
             print('Exception in function {} with args {} and kwargs {}'.format(func.__name__, args, kwargs))
-            print('Exception: {}'.format(e))
-            exit(1)
+            traceback.print_exc()
+            raise e
 
     return wrapper
 
@@ -22,3 +23,8 @@ def time_it(func):
         return result
 
     return wrapper
+
+
+@try_catch
+def map_range(value, low1, high1, low2, high2):
+    return low2 + (value - low1) * (high2 - low2) / (high1 - low1)
