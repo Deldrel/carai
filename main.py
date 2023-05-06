@@ -10,9 +10,9 @@ import random
 def init():
     pygame.init()
     pygame.display.set_caption('Game')
-    for i in range(100):
-        nn = neuralnet.NeuralNetwork([2, 3, 4])
-        square = player.Player(v.window, 0, v.window.get_height() / 2, 10, 10, (255, 0, 0), 5, nn)
+    for i in range(200):
+        nn = neuralnet.NeuralNetwork([3, 5, 5, 4])
+        square = player.Player(0, 0, 10, 10, (255, 0, 0), 5, nn)
         v.population.append(square)
 
 
@@ -27,16 +27,16 @@ def newgen():
     avg_fitness /= len(v.population)
     print('Average fitness: {}'.format(avg_fitness) + ' Best fitness: {}'.format(best_fitness))
 
-    v.population.sort(key=lambda x: x.fitness(), reverse=False)
-    v.population.reverse()
+    v.population.sort(key=lambda x: x.fitness(), reverse=True)
     new_population = []
-    for i in range(len(v.population) // 10):
+    percent10index = len(v.population) // 10
+    for i in range(percent10index):
         new_population.append(v.population[i])
 
-    for i in range(len(v.population) // 2):
+    for i in range(percent10index, len(v.population) - percent10index):
         parent = random.choice(new_population)
-        v.population[i].update(v.population[i].neuralnetwork.breed(parent.neuralnetwork, 0))
-    for i in range(len(v.population) // 2):
+        v.population[i].update(v.population[i].neuralnetwork.breed(parent.neuralnetwork, 0.5))
+    for i in range(percent10index, len(v.population) - percent10index):
         v.population[i].neuralnetwork.mutate(0.01)
     for i in range(len(v.population)):
         v.population[i].state = 1
@@ -50,6 +50,7 @@ def draw():
     for square in v.population:
         if square.state == 1:
             square.draw()
+    pygame.draw.rect(v.window, (0, 255, 0), (v.target[0], v.target[1], 10, 10))
     pygame.display.update()
 
 
@@ -62,15 +63,14 @@ def handle_events():
 
 @utils.try_catch
 def update(dt):
-    handle_events()
     if v.counter >= v.number_of_steps:
         newgen()
         v.counter = 0
     for square in v.population:
         if square.state == 0:
             continue
-        input = [square.x - v.window.get_width(), square.y - v.window.get_height()]
-        output = square.neuralnetwork.feedforward(input)
+        inputparams = [square.x / v.window.get_width(), square.y / v.window.get_height(), square.fitness()]
+        output = square.neuralnetwork.feedforward(inputparams)
         if output[0] > 0.5:
             square.move(0, -square.speed)
         if output[1] > 0.5:
@@ -86,6 +86,7 @@ def update(dt):
 def loop():
     clock = pygame.time.Clock()
     while not v.done:
+        handle_events()
         update(clock.tick(v.fps))
         draw()
 

@@ -28,3 +28,8 @@ def time_it(func):
 @try_catch
 def map_range(value, low1, high1, low2, high2):
     return low2 + (value - low1) * (high2 - low2) / (high1 - low1)
+
+
+@try_catch
+def distance(x1, y1, x2, y2):
+    return ((x1 - x2) ** 2 + (y1 - y2) ** 2) ** (1 / 2)

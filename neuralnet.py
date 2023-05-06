@@ -22,14 +22,14 @@ class NeuralNetwork:
             self.biases.append(np.random.randn(self.architecture[i], 1))
 
     @utils.try_catch
-    def feedforward(self, input):
-        input = np.array(input)
-        input = input.reshape(len(input), 1)
+    def feedforward(self, inputparams):
+        inputparams = np.array(inputparams)
+        inputparams = inputparams.reshape(len(inputparams), 1)
         for i in range(len(self.weights)):
-            input = np.dot(self.weights[i], input)
-            input += self.biases[i]
-            input = self.activation(input)
-        return input
+            inputparams = np.dot(self.weights[i], inputparams)
+            inputparams += self.biases[i]
+            inputparams = self.activation(inputparams)
+        return inputparams
 
     @utils.try_catch
     def activation(self, x):
